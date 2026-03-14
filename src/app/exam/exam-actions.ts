@@ -124,7 +124,7 @@ export async function submitExamResult(participantId: string, questionsCorrect: 
         total_questions: 21,
         completed_at: new Date().toISOString(),
         duration_seconds: durationSeconds,
-        // answers: answers // Temporairement désactivé car la colonne n'existe pas dans la DB
+        answers: answers // Réactivé : la colonne JSONB doit être présente en DB
       }]);
 
     if (error) throw error;
