@@ -58,13 +58,9 @@ export async function validateParticipantForExam(email: string) {
     }
 
     // 4. Validation des conditions de présence
+    // Seule la présence au Jour 3 est obligatoire
     if (!att.day_3) {
       return { success: false, error: 'La présence au Jour 3 (aujourd\'hui) est obligatoire pour passer l\'examen.' };
-    }
-
-    const presenceCount = [att.day_1, att.day_2, att.day_3].filter(Boolean).length;
-    if (presenceCount < 2) {
-      return { success: false, error: 'Vous devez avoir été présent au moins 2 jours sur 3 pour passer l\'examen.' };
     }
 
     return { success: true, alreadyFinished: false, participantId: participant.id };
