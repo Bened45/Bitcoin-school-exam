@@ -9,6 +9,8 @@ import { validateParticipantForExam, getExamQuestions, submitExamResult, Questio
 export default function BitcoinExamPage() {
   const [step, setStep] = useState<'login' | 'quiz' | 'result'>('login');
   const [email, setEmail] = useState('');
+  const [city, setCity] = useState('');
+  const [sessionYear, setSessionYear] = useState(new Date().getFullYear());
   const [participantId, setParticipantId] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -60,7 +62,13 @@ export default function BitcoinExamPage() {
     setLoading(true);
     setError('');
     
-    const result = await validateParticipantForExam(email);
+    if (!city) {
+      setError('Veuillez sélectionner votre ville.');
+      setLoading(false);
+      return;
+    }
+    
+    const result = await validateParticipantForExam(email, city, sessionYear);
     if (result.success) {
       setParticipantId(result.participantId!);
       
@@ -137,14 +145,48 @@ export default function BitcoinExamPage() {
             <p className="text-gray-400 mt-2">Accédez à votre session d'examen</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-6">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-4 text-white focus:border-[#53CB60] transition-colors outline-none"
-              placeholder="votre@email.com"
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Adresse E-mail</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-4 text-white focus:border-[#53CB60] transition-colors outline-none"
+                placeholder="votre@email.com"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Ville</label>
+              <select
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-4 text-white focus:border-[#53CB60] transition-colors outline-none"
+                required
+              >
+                <option value="">Sélectionnez votre ville</option>
+                <option value="Cotonou">Cotonou</option>
+                <option value="Porto Novo">Porto Novo</option>
+                <option value="Abomey-Calavi">Abomey-Calavi</option>
+                <option value="Parakou">Parakou</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Session</label>
+              <select
+                value={sessionYear}
+                onChange={(e) => setSessionYear(Number(e.target.value))}
+                className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-4 text-white focus:border-[#53CB60] transition-colors outline-none"
+                required
+              >
+                <option value={2026}>2026</option>
+                <option value={2025}>2025</option>
+                <option value={2024}>2024</option>
+              </select>
+            </div>
+
             <div className="p-4 bg-white/5 rounded-xl border border-white/5 text-sm text-gray-400">
               <p>📌 21 questions</p>
               <p>⏱️ 21 minutes</p>
