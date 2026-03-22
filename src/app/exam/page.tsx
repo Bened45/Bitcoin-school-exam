@@ -20,12 +20,18 @@ export default function BitcoinExamPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [scoreData, setScoreData] = useState<{total: number, attendance: number, exam: number} | null>(null);
+  const [autoSubmitMessage, setAutoSubmitMessage] = useState('');
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleSubmitQuiz = async () => {
+  const handleSubmitQuiz = async (isAutoSubmit: boolean = false) => {
     if (loading) return;
     setLoading(true);
+    
+    // Si soumission automatique, afficher le message
+    if (isAutoSubmit) {
+      setAutoSubmitMessage('Temps écoulé - Vos réponses ont été soumises automatiquement');
+    }
     
     let correctCount = 0;
     questions.forEach((q, idx) => {
@@ -117,7 +123,7 @@ export default function BitcoinExamPage() {
         setTimeLeft((prev) => {
           if (prev <= 1) {
             clearInterval(timerRef.current!);
-            handleSubmitQuiz();
+            handleSubmitQuiz(true);  // ← SOUMISSION AUTOMATIQUE AVEC MESSAGE
             return 0;
           }
           return prev - 1;
@@ -249,6 +255,13 @@ export default function BitcoinExamPage() {
         <div className="max-w-4xl mx-auto">
           {/* Main Score Card */}
           <Card className="p-12 bg-[#0F172A50] border border-white/10 text-center mb-12 relative overflow-hidden backdrop-blur-xl">
+             {/* Message de soumission automatique */}
+             {autoSubmitMessage && (
+               <div className="mb-8 p-4 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-lg flex items-center gap-3 text-sm animate-pulse">
+                 <FaExclamationTriangle />
+                 <span>{autoSubmitMessage}</span>
+               </div>
+             )}
              <div className="absolute top-0 right-0 w-64 h-64 bg-[#53CB6008] blur-3xl -translate-y-1/2 translate-x-1/2 rounded-full" />
              <div className="w-24 h-24 bg-[#53CB6010] rounded-full flex items-center justify-center text-[#53CB60] text-6xl mx-auto mb-8 animate-bounce shadow-glow"><FaCheckCircle /></div>
              <h1 className="text-5xl font-black text-white mb-4 tracking-tighter">Félicitations !</h1>
