@@ -19,20 +19,20 @@ export default function BitcoinExamPage() {
   const [timeLeft, setTimeLeft] = useState(21 * 60); // 21 minutes en secondes
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [scoreData, setScoreData] = useState<{total: number, attendance: number, exam: number} | null>(null);
+  const [scoreData, setScoreData] = useState<{ total: number, attendance: number, exam: number } | null>(null);
   const [autoSubmitMessage, setAutoSubmitMessage] = useState('');
-  
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSubmitQuiz = async (isAutoSubmit: boolean = false) => {
     if (loading) return;
     setLoading(true);
-    
+
     // Si soumission automatique, afficher le message
     if (isAutoSubmit) {
       setAutoSubmitMessage('Temps écoulé - Vos réponses ont été soumises automatiquement');
     }
-    
+
     let correctCount = 0;
     questions.forEach((q, idx) => {
       if (answers[idx] === q.correct_option_index) correctCount++;
@@ -41,7 +41,7 @@ export default function BitcoinExamPage() {
     const durationSeconds = Math.floor((Date.now() - startTime) / 1000);
     // On passe les 'answers' à la fonction de sauvegarde
     const result = await submitExamResult(participantId, correctCount, durationSeconds, answers);
-    
+
     if (result.success) {
       setScoreData({
         total: result.totalScore!,
@@ -67,24 +67,24 @@ export default function BitcoinExamPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+
     if (!city) {
       setError('Veuillez sélectionner votre ville.');
       setLoading(false);
       return;
     }
-    
+
     const result = await validateParticipantForExam(email, city, sessionYear);
     if (result.success) {
       setParticipantId(result.participantId!);
-      
+
       // CAS DÉJÀ FINI
       if (result.alreadyFinished) {
         const quizData = await getExamQuestions(); // On récupère quand même les questions pour la revue
         if (quizData.success) {
           setQuestions(quizData.questions || []);
           setAnswers(result.existingResult.answers || {});
-          
+
           // Plus précis : on recalcule les points d'examen à partir des réponses et questions
           let examPoints = 0;
           (quizData.questions || []).forEach((q: any, idx: number) => {
@@ -176,6 +176,9 @@ export default function BitcoinExamPage() {
                 <option value="Porto Novo">Porto Novo</option>
                 <option value="Abomey-Calavi">Abomey-Calavi</option>
                 <option value="Parakou">Parakou</option>
+                <option value="Ouidah">Ouidah</option>
+                <option value="Dassa-Zoumè">Dassa-Zoumè</option>
+                <option value="Bohicon">Bohicon</option>
               </select>
             </div>
 
@@ -255,36 +258,36 @@ export default function BitcoinExamPage() {
         <div className="max-w-4xl mx-auto">
           {/* Main Score Card */}
           <Card className="p-12 bg-[#0F172A50] border border-white/10 text-center mb-12 relative overflow-hidden backdrop-blur-xl">
-             {/* Message de soumission automatique */}
-             {autoSubmitMessage && (
-               <div className="mb-8 p-4 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-lg flex items-center gap-3 text-sm animate-pulse">
-                 <FaExclamationTriangle />
-                 <span>{autoSubmitMessage}</span>
-               </div>
-             )}
-             <div className="absolute top-0 right-0 w-64 h-64 bg-[#53CB6008] blur-3xl -translate-y-1/2 translate-x-1/2 rounded-full" />
-             <div className="w-24 h-24 bg-[#53CB6010] rounded-full flex items-center justify-center text-[#53CB60] text-6xl mx-auto mb-8 animate-bounce shadow-glow"><FaCheckCircle /></div>
-             <h1 className="text-5xl font-black text-white mb-4 tracking-tighter">Félicitations !</h1>
-             <p className="text-xl text-gray-400 mb-10">Votre évaluation est terminée. Voici le détail de votre performance.</p>
-             
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-               <div className="bg-[#020617] p-6 rounded-3xl border border-white/5">
-                 <div className="text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Présence</div>
-                 <div className="text-3xl font-black text-white">{scoreData.attendance} <span className="text-sm text-gray-600">/ 16</span></div>
-               </div>
-               <div className="bg-[#020617] p-6 rounded-3xl border border-white/5">
-                 <div className="text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Examen QCM</div>
-                 <div className="text-3xl font-black text-white">{scoreData.exam} <span className="text-sm text-gray-600">/ 84</span></div>
-               </div>
-               <div className="bg-brand-green/10 p-6 rounded-3xl border border-brand-green/20 ring-2 ring-brand-green/20">
-                 <div className="text-xs font-black text-brand-green uppercase tracking-widest mb-2">Total Final</div>
-                 <div className="text-5xl font-black text-brand-green">{scoreData.total} <span className="text-sm text-gray-500">/ 100</span></div>
-               </div>
-             </div>
+            {/* Message de soumission automatique */}
+            {autoSubmitMessage && (
+              <div className="mb-8 p-4 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-lg flex items-center gap-3 text-sm animate-pulse">
+                <FaExclamationTriangle />
+                <span>{autoSubmitMessage}</span>
+              </div>
+            )}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#53CB6008] blur-3xl -translate-y-1/2 translate-x-1/2 rounded-full" />
+            <div className="w-24 h-24 bg-[#53CB6010] rounded-full flex items-center justify-center text-[#53CB60] text-6xl mx-auto mb-8 animate-bounce shadow-glow"><FaCheckCircle /></div>
+            <h1 className="text-5xl font-black text-white mb-4 tracking-tighter">Félicitations !</h1>
+            <p className="text-xl text-gray-400 mb-10">Votre évaluation est terminée. Voici le détail de votre performance.</p>
 
-             <Button variant="ghost" className="text-gray-500 hover:text-white" onClick={() => document.getElementById('review')?.scrollIntoView({behavior:'smooth'})}>
-               Revoir les réponses <FaArrowRight className="ml-2 rotate-90" />
-             </Button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div className="bg-[#020617] p-6 rounded-3xl border border-white/5">
+                <div className="text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Présence</div>
+                <div className="text-3xl font-black text-white">{scoreData.attendance} <span className="text-sm text-gray-600">/ 16</span></div>
+              </div>
+              <div className="bg-[#020617] p-6 rounded-3xl border border-white/5">
+                <div className="text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Examen QCM</div>
+                <div className="text-3xl font-black text-white">{scoreData.exam} <span className="text-sm text-gray-600">/ 84</span></div>
+              </div>
+              <div className="bg-brand-green/10 p-6 rounded-3xl border border-brand-green/20 ring-2 ring-brand-green/20">
+                <div className="text-xs font-black text-brand-green uppercase tracking-widest mb-2">Total Final</div>
+                <div className="text-5xl font-black text-brand-green">{scoreData.total} <span className="text-sm text-gray-500">/ 100</span></div>
+              </div>
+            </div>
+
+            <Button variant="ghost" className="text-gray-500 hover:text-white" onClick={() => document.getElementById('review')?.scrollIntoView({ behavior: 'smooth' })}>
+              Revoir les réponses <FaArrowRight className="ml-2 rotate-90" />
+            </Button>
           </Card>
 
           {/* Review Section */}
@@ -293,11 +296,11 @@ export default function BitcoinExamPage() {
               <span className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-xl text-[#53CB60]">?</span>
               Revue des Questions
             </h2>
-            
+
             {questions.map((q, idx) => {
               const userAnswer = answers[idx];
               const isCorrect = userAnswer === q.correct_option_index;
-              
+
               return (
                 <div key={idx} className={`p-8 rounded-3xl border transition-all ${isCorrect ? 'bg-[#53CB6005] border-[#53CB6010]' : 'bg-red-500/05 border-red-500/10'}`}>
                   <div className="flex items-start gap-4 mb-6">
@@ -311,13 +314,12 @@ export default function BitcoinExamPage() {
                     {q.options.map((opt, oIdx) => {
                       const isCorrectOption = oIdx === q.correct_option_index;
                       const isUserChoice = oIdx === userAnswer;
-                      
+
                       return (
-                        <div key={oIdx} className={`p-4 rounded-xl flex items-center justify-between gap-3 text-sm border ${
-                          isCorrectOption ? 'bg-[#53CB6010] border-[#53CB6030] text-[#53CB60]' : 
-                          isUserChoice ? 'bg-red-500/10 border-red-500/30 text-red-400' : 
-                          'bg-[#020617] border-white/5 text-gray-500'
-                        }`}>
+                        <div key={oIdx} className={`p-4 rounded-xl flex items-center justify-between gap-3 text-sm border ${isCorrectOption ? 'bg-[#53CB6010] border-[#53CB6030] text-[#53CB60]' :
+                          isUserChoice ? 'bg-red-500/10 border-red-500/30 text-red-400' :
+                            'bg-[#020617] border-white/5 text-gray-500'
+                          }`}>
                           <span className="flex items-center gap-3">
                             <span className="font-bold">{String.fromCharCode(65 + oIdx)}.</span> {opt}
                           </span>
